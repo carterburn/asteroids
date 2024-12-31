@@ -49,7 +49,7 @@ def main():
                 if asteroid.collision(shot):
                     # 10 points for a shot
                     score += 10
-                    asteroid.kill()
+                    asteroid.split()
                     shot.kill()
                     break
 
