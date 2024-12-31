@@ -7,6 +7,7 @@ from shot import Shot
 
 def main():
     _ = pygame.init()
+    pygame.font.init()
     print("Starting asteroids!")
     print("Screen width:", SCREEN_WIDTH)
     print("Screen height:", SCREEN_HEIGHT)
@@ -26,6 +27,10 @@ def main():
 
     clock = pygame.time.Clock()
     dt = 0
+    time_window = 0
+    score = 0
+
+    font = pygame.font.Font(None, 36)
 
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
     field = AsteroidField()
@@ -39,9 +44,23 @@ def main():
             sprite.update(dt)
 
         for asteroid in asteroids:
+            # see if this asteroid was destroyed by a bullet
+            for shot in shots:
+                if asteroid.collision(shot):
+                    # 10 points for a shot
+                    score += 10
+                    asteroid.kill()
+                    shot.kill()
+                    break
+
             if asteroid.collision(player):
                 print("Game over!")
                 return
+
+        # check if the player has been alive for 10 seconds to get another point 
+        if time_window > 10:
+            score += 1
+            time_window = 0
 
         # render
         screen.fill(black)
@@ -49,9 +68,13 @@ def main():
         for sprite in drawable:
             sprite.draw(screen)
 
+        score_text = font.render(f'Score: {score}', True, (255, 255, 255))
+        screen.blit(score_text, (10, 10))
+
         pygame.display.flip()
 
         dt = clock.tick(60) / 1000
+        time_window += dt
 
 if __name__ == "__main__":
     main()
